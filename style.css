@@ -1,23 +1,214 @@
-body { font-family: Arial, sans-serif; background: #f6f2ee; margin: 0; padding: 0; }
-.app { max-width: 480px; margin: 30px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e9eef3;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
 
-h1 { text-align:center; margin-bottom: 2px; }
-.subtitle { text-align:center; font-size: 0.85rem; color: #777; margin-top: 0; margin-bottom: 15px; }
+.phone {
+  width: 360px;
+  height: 640px;
+  background: white;
+  border-radius: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-h2 { text-align:center; margin-top:0; }
-.tabs{display:flex;gap:6px;margin-bottom:15px;}
-.tab{flex:1;padding:10px;border:none;background:#ddd;border-radius:6px;cursor:pointer;font-weight:bold;transition:background 0.2s;}
-.tab:hover{background:#ccc;}
-.tab.active{background:#c47a2c;color:white;}
-.panel{display:none;}
-.panel.active{display:block;}
-label{display:block;margin-bottom:12px;font-weight:500;}
-input, select, textarea{width:100%;padding:6px;margin-top:4px;border-radius:6px;border:1px solid #ccc;box-sizing:border-box;font-size:1rem;}
-textarea{height:130px;resize:vertical;}
-button{width:100%;padding:12px;margin-top:12px;background:#c47a2c;color:white;border:none;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:bold;transition:background 0.2s;}
-button:hover{background:#a55c1e;}
-.results{margin-top:15px;background:#fff4e6;padding:12px;border-radius:6px;line-height:1.5;font-size:0.95rem;}
-.warning{color:red;font-weight:bold;}
-#savedMsg{margin-top:8px;color:green;font-weight:bold;text-align:center;}
-select.scrollable{max-height:36px;overflow-y:auto;}
-@media(max-width:500px){.app{margin:20px;padding:15px;}}
+.topbar {
+  background: #2e7d32;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.left-buttons {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.home-text {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.top-new-btn {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  background: white;
+  color: #2e7d32;
+  border: none;
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.title-group { line-height: 1.1; }
+.main-title { font-size: 18px; font-weight: bold; }
+.sub-title { font-size: 11px; opacity: 0.9; }
+
+.screen { flex: 1; display: flex; flex-direction: column; }
+.hidden { display: none; }
+
+.main-btn {
+  margin: auto;
+  padding: 15px 25px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  background: #43a047;
+  color: white;
+  cursor: pointer;
+}
+
+.trip-name-input {
+  margin: 8px;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.search-row { padding: 0 8px; }
+.search-wrapper { position: relative; }
+
+#searchInput {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.results-dropdown {
+  position: absolute;
+  top: 38px;
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.result-item { padding: 8px; cursor: pointer; }
+.result-item:hover { background: #eee; }
+
+.map-controls {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px;
+}
+
+.map-controls button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  background: #2e7d32;
+  color: white;
+  cursor: pointer;
+}
+
+#map { flex: 1; }
+
+.distance-info {
+  text-align: center;
+  font-size: 12px;
+  padding: 4px;
+  background: #f1f8e9;
+}
+
+.trip-grid {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.trip-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+.trip-card-title {
+  padding: 6px;
+  font-weight: bold;
+  font-size: 13px;
+  background: #2e7d32;
+  color: white;
+}
+
+.trip-preview { height: 70px; }
+
+.leaflet-tooltip.stop-label {
+  background: white;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* CODES SCREEN */
+.codes-container {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.codes-container input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+#saveCodeBtn {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #2e7d32;
+  color: white;
+  cursor: pointer;
+}
+
+.codes-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.code-card {
+  background: #f1f1f1;
+  padding: 8px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.code-card button {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  border: none;
+  background: #c62828;
+  color: white;
+  border-radius: 6px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
