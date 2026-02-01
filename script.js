@@ -1,124 +1,229 @@
-function openTab(id, el){
-  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  el.classList.add("active");
+const mainNewTripBtn = document.getElementById("mainNewTripBtn");
+const topTripBtn = document.getElementById("topTripBtn");
+const homeBtn = document.getElementById("homeBtn");
+const codesBtn = document.getElementById("codesBtn");
+const saveTripBtn = document.getElementById("saveTripBtn");
+const tripNameInput = document.getElementById("tripNameInput");
+const distanceInfo = document.getElementById("distanceInfo");
+
+const homeScreen = document.getElementById("homeScreen");
+const mapScreen = document.getElementById("mapScreen");
+const codesScreen = document.getElementById("codesScreen");
+const tripListDiv = document.getElementById("tripList");
+
+const searchInput = document.getElementById("searchInput");
+const routeBtn = document.getElementById("routeBtn");
+const poiBtn = document.getElementById("poiBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+const resultsDiv = document.getElementById("results");
+
+const codeInput = document.getElementById("codeInput");
+const codeLabelInput = document.getElementById("codeLabelInput");
+const saveCodeBtn = document.getElementById("saveCodeBtn");
+const codesList = document.getElementById("codesList");
+
+let map = L.map("map").setView([20,0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+let selectedPlace = null;
+let routeMarkers = [], poiMarkers = [], routeLine = null;
+let trips = JSON.parse(localStorage.getItem("trips") || "[]");
+let codes = JSON.parse(localStorage.getItem("codes") || "[]");
+let currentTripIndex = null;
+
+/* NAVIGATION */
+function showHome() {
+  mapScreen.classList.add("hidden");
+  codesScreen.classList.add("hidden");
+  homeScreen.classList.remove("hidden");
 }
 
-// ---------- BREAD ----------
-const breadFlour=document.getElementById("breadFlour");
-const breadWheat=document.getElementById("breadWheat");
-const breadCount=document.getElementById("breadCount");
-const breadSize=document.getElementById("breadSize");
-const breadHydration=document.getElementById("breadHydration");
-const breadYeast=document.getElementById("breadYeast");
-const breadResults=document.getElementById("breadResults");
-
-for(let h=40; h<=90; h+=2){
-  breadHydration.innerHTML+=`<option value="${h}">${h}%</option>`;
+function showMap() {
+  homeScreen.classList.add("hidden");
+  codesScreen.classList.add("hidden");
+  mapScreen.classList.remove("hidden");
+  setTimeout(()=>map.invalidateSize(),200);
 }
 
-function calcBread(){
-  const flourAvailable=+breadFlour.value;
-  const wheatPercent=+breadWheat.value||0;
-  const count=+breadCount.value;
-  const flourPerLoaf=+breadSize.value;
-  const hydration=+breadHydration.value;
-  const yeast=breadYeast.value;
-
-  if(!count||!flourPerLoaf||!hydration||!yeast){ breadResults.innerHTML="<em>Please choose all options.</em>"; return; }
-
-  const totalFlour=flourPerLoaf*count;
-  const wholeWheatFlour=totalFlour*(wheatPercent/100);
-  const whiteFlour=totalFlour-wholeWheatFlour;
-
-  const water=totalFlour*(hydration/100);
-  const salt=totalFlour*0.02;
-  const yeastAmount=yeast==="sourdough"?totalFlour*0.2:totalFlour*0.01;
-  const totalDough=totalFlour+water+salt+yeastAmount;
-  const perLoaf=totalDough/count;
-  const diff=flourAvailable-totalFlour;
-  const warning = diff<0 ? `<span class="warning">⚠ Not enough flour!</span>` : "";
-
-  breadResults.innerHTML=`
-  <strong>Total (${count} loaves):</strong><br>
-  Flour: ${totalFlour.toFixed(0)} g<br>
-  • White: ${whiteFlour.toFixed(0)} g<br>
-  • Whole wheat: ${wholeWheatFlour.toFixed(0)} g<br>
-  Water: ${water.toFixed(0)} g<br>
-  Salt: ${salt.toFixed(1)} g<br>
-  Yeast: ${yeastAmount.toFixed(1)} g<br><br>
-  <strong>Per loaf:</strong> ${perLoaf.toFixed(0)} g<br><br>
-  ${diff>=0?`You’ll have ${diff.toFixed(0)}g flour left.`:`You need ${Math.abs(diff).toFixed(0)}g more flour.`} ${warning}
-  `;
+function showCodes() {
+  homeScreen.classList.add("hidden");
+  mapScreen.classList.add("hidden");
+  codesScreen.classList.remove("hidden");
 }
 
-// ---------- PIZZA ----------
-const pizzaFlourInput=document.getElementById("pizzaFlour");
-const pizzaWheatInput=document.getElementById("pizzaWheat");
-const pizzaCountInput=document.getElementById("pizzaCount");
-const pizzaSizeSelect=document.getElementById("pizzaSize");
-const pizzaHydrationSelect=document.getElementById("pizzaHydration");
-const pizzaYeastSelect=document.getElementById("pizzaYeast");
-const pizzaResultsDiv=document.getElementById("pizzaResults");
+homeBtn.onclick = showHome;
+codesBtn.onclick = showCodes;
 
-const pizzaSizes=[10,11,12,13,14,15,16,17,18];
-const pizzaBase12=270; 
-const pizzaSaltPerc=0.025;
+/* TRIPS */
+function openNewTrip() {
+  tripNameInput.value = "Untitled Trip";
+  clearMap();
+  currentTripIndex = null;
+  showMap();
+}
 
-pizzaSizes.forEach(size=>{
-  const dough= pizzaBase12*(size/12)**2;
-  pizzaSizeSelect.innerHTML+=`<option value="${size}">${size}" (${dough.toFixed(0)}g dough)</option>`;
+mainNewTripBtn.onclick = openNewTrip;
+topTripBtn.onclick = openNewTrip;
+
+function clearMap() {
+  routeMarkers.forEach(m=>map.removeLayer(m));
+  poiMarkers.forEach(m=>map.removeLayer(m));
+  if(routeLine) map.removeLayer(routeLine);
+  routeMarkers=[]; poiMarkers=[]; routeLine=null;
+  distanceInfo.textContent="";
+}
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value;
+  if (query.length < 3) return;
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+    .then(res=>res.json())
+    .then(data=>{
+      resultsDiv.innerHTML="";
+      data.slice(0,5).forEach(place=>{
+        const div=document.createElement("div");
+        div.className="result-item";
+        div.textContent=place.display_name;
+        div.onclick=()=>selectPlace(place);
+        resultsDiv.appendChild(div);
+      });
+    });
 });
 
-for(let h=40;h<=90;h+=2){
-  pizzaHydrationSelect.innerHTML+=`<option value="${h}">${h}%</option>`;
+function selectPlace(place){
+  selectedPlace=place;
+  resultsDiv.innerHTML="";
+  map.setView([place.lat,place.lon],10);
+  routeBtn.disabled=false;
+  poiBtn.disabled=false;
 }
 
-function calcPizza(){
-  const flourAvailable=+pizzaFlourInput.value;
-  const wheatPercent=+pizzaWheatInput.value||0;
-  const count=+pizzaCountInput.value;
-  const size=+pizzaSizeSelect.value;
-  const hydration=+pizzaHydrationSelect.value;
-  const yeast=pizzaYeastSelect.value;
+function addMarker(type){
+  if(!selectedPlace) return;
+  const name=selectedPlace.display_name.split(",")[0];
+  const marker=L.marker([selectedPlace.lat,selectedPlace.lon]).addTo(map)
+    .bindTooltip(name,{permanent:true,direction:"top",className:"stop-label"});
+  marker._label=name;
 
-  if(!flourAvailable||!count||!size||!hydration||!yeast){ pizzaResultsDiv.innerHTML="<em>Please choose all options.</em>"; return; }
-
-  const yeastPerc=yeast==="sourdough"?0.2:yeast==="dry"?0.005:0.01;
-  const doughOne=pizzaBase12*(size/12)**2;
-  const flour= doughOne / (1 + hydration/100 + pizzaSaltPerc + yeastPerc);
-  const totalFlourNeeded=flour*count;
-
-  const wholeWheatFlour=totalFlourNeeded*(wheatPercent/100);
-  const whiteFlour=totalFlourNeeded-wholeWheatFlour;
-
-  const water= flour*(hydration/100)*count;
-  const salt= flour*pizzaSaltPerc*count;
-  const yeastAmount= flour*yeastPerc*count;
-  const totalDough=(flour+flour*(hydration/100)+flour*pizzaSaltPerc+flour*yeastPerc)*count;
-  const diff=flourAvailable-totalFlourNeeded;
-  const warning = diff<0 ? `<span class="warning">⚠ Not enough flour!</span>` : "";
-
-  pizzaResultsDiv.innerHTML=`
-    <strong>Total (${count} pizzas):</strong><br>
-    Flour: ${totalFlourNeeded.toFixed(0)} g<br>
-    • White: ${whiteFlour.toFixed(0)} g<br>
-    • Whole wheat: ${wholeWheatFlour.toFixed(0)} g<br>
-    Water: ${water.toFixed(0)} g<br>
-    Salt: ${salt.toFixed(1)} g<br>
-    Yeast: ${yeastAmount.toFixed(1)} g<br><br>
-    <strong>Per pizza dough:</strong> ${doughOne.toFixed(0)} g<br><br>
-    ${diff>=0?`You’ll have ${diff.toFixed(0)}g flour left.`:`You need ${Math.abs(diff).toFixed(0)}g more flour.`} ${warning}
-  `;
+  if(type==="route"){ routeMarkers.push(marker); updateRouteLine(); }
+  else poiMarkers.push(marker);
 }
 
-// Auto updates
-[breadFlour,breadWheat,breadCount,breadSize,breadHydration,breadYeast].forEach(el=>el.addEventListener("input",calcBread));
-[pizzaFlourInput,pizzaWheatInput,pizzaCountInput,pizzaSizeSelect,pizzaHydrationSelect,pizzaYeastSelect].forEach(el=>el.addEventListener("input",calcPizza));
+routeBtn.onclick=()=>addMarker("route");
+poiBtn.onclick=()=>addMarker("poi");
 
-// Notes
-const notesText=document.getElementById("notesText");
-const savedMsg=document.getElementById("savedMsg");
-function saveNotes(){localStorage.setItem("doughNotes",notesText.value);savedMsg.textContent="Notes saved ✔";}
-notesText.value=localStorage.getItem("doughNotes")||"";
+function updateRouteLine(){
+  if(routeLine) map.removeLayer(routeLine);
+  routeLine=L.polyline(routeMarkers.map(m=>m.getLatLng()),{color:randomColor()}).addTo(map);
+  updateDistance();
+}
+
+function updateDistance(){
+  let total=0;
+  for(let i=1;i<routeMarkers.length;i++){
+    total+=routeMarkers[i-1].getLatLng().distanceTo(routeMarkers[i].getLatLng());
+  }
+  distanceInfo.textContent=routeMarkers.length>1?`Route distance: ${(total/1000).toFixed(1)} km`:"";
+}
+
+saveTripBtn.onclick=()=>{
+  const trip={
+    name:tripNameInput.value,
+    route:routeMarkers.map(m=>({lat:m.getLatLng().lat,lon:m.getLatLng().lng,label:m._label})),
+    pois:poiMarkers.map(m=>({lat:m.getLatLng().lat,lon:m.getLatLng().lng,label:m._label})),
+    color:routeLine?routeLine.options.color:randomColor()
+  };
+  if(currentTripIndex!==null) trips[currentTripIndex]=trip;
+  else trips.push(trip);
+  localStorage.setItem("trips",JSON.stringify(trips));
+  renderTrips();
+  showHome();
+};
+
+function renderTrips(){
+  tripListDiv.innerHTML="";
+  trips.forEach((trip,index)=>{
+    const card=document.createElement("div");
+    card.className="trip-card";
+    card.onclick=()=>openTrip(index);
+
+    const title=document.createElement("div");
+    title.className="trip-card-title";
+    title.textContent=trip.name;
+
+    const preview=document.createElement("div");
+    preview.className="trip-preview";
+
+    card.appendChild(title);
+    card.appendChild(preview);
+    tripListDiv.appendChild(card);
+
+    const mini=L.map(preview,{zoomControl:false,attributionControl:false,dragging:false})
+      .setView([trip.route[0]?.lat||0,trip.route[0]?.lon||0],3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mini);
+    if(trip.route.length>1) L.polyline(trip.route.map(p=>[p.lat,p.lon]),{color:trip.color}).addTo(mini);
+  });
+
+  if(trips.length>0){
+    mainNewTripBtn.classList.add("hidden");
+    topTripBtn.classList.remove("hidden");
+  }
+}
+
+function openTrip(index){
+  const trip=trips[index];
+  currentTripIndex=index;
+  tripNameInput.value=trip.name;
+  clearMap();
+  showMap();
+
+  trip.route.forEach(p=>{
+    const m=L.marker([p.lat,p.lon]).addTo(map)
+      .bindTooltip(p.label,{permanent:true,direction:"top",className:"stop-label"});
+    m._label=p.label;
+    routeMarkers.push(m);
+  });
+
+  trip.pois.forEach(p=>{
+    const m=L.marker([p.lat,p.lon]).addTo(map)
+      .bindTooltip(p.label,{permanent:true,direction:"top",className:"stop-label"});
+    poiMarkers.push(m);
+  });
+
+  routeLine=L.polyline(routeMarkers.map(m=>m.getLatLng()),{color:trip.color}).addTo(map);
+  updateDistance();
+}
+
+function randomColor(){
+  return `hsl(${Math.floor(Math.random()*360)},70%,45%)`;
+}
+
+/* CODES */
+function renderCodes(){
+  codesList.innerHTML="";
+  codes.forEach((c,i)=>{
+    const card=document.createElement("div");
+    card.className="code-card";
+    card.innerHTML=`<strong>${c.label}</strong><br>${c.code}`;
+    const del=document.createElement("button");
+    del.textContent="X";
+    del.onclick=()=>{
+      codes.splice(i,1);
+      localStorage.setItem("codes",JSON.stringify(codes));
+      renderCodes();
+    };
+    card.appendChild(del);
+    codesList.appendChild(card);
+  });
+}
+
+saveCodeBtn.onclick=()=>{
+  if(!codeInput.value) return;
+  codes.push({label:codeLabelInput.value||"Code",code:codeInput.value});
+  localStorage.setItem("codes",JSON.stringify(codes));
+  codeInput.value=""; codeLabelInput.value="";
+  renderCodes();
+};
+
+renderTrips();
+renderCodes();
