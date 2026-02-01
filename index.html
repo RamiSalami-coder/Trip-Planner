@@ -1,132 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dough Calculator</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="app">
-  <h1>🍞 Dough Calculator</h1>
-  <p class="subtitle">by ChickChickRam</p>
+<div class="phone">
+  <div class="topbar">
+    <div class="left-buttons">
+      <span class="home-text" id="homeBtn">Home</span>
+      <span class="home-text" id="codesBtn">Codes</span>
+    </div>
 
-  <div class="tabs">
-    <button class="tab active" onclick="openTab('bread', this)">Bread</button>
-    <button class="tab" onclick="openTab('pizza', this)">Pizza</button>
-    <button class="tab" onclick="openTab('recipes', this)">Recipes / Videos</button>
-    <button class="tab" onclick="openTab('notes', this)">Notes</button>
+    <div class="title-group">
+      <div class="main-title">Trip Planner</div>
+      <div class="sub-title">by ChickChickRam</div>
+    </div>
+
+    <button id="topTripBtn" class="top-new-btn hidden">+ Trip</button>
   </div>
 
-  <!-- BREAD -->
-  <div id="bread" class="panel active">
-    <h2>Bread</h2>
-    <label>Total flour available (g)
-      <input id="breadFlour" type="number" value="900">
-    </label>
-
-    <label>Whole wheat %
-      <input id="breadWheat" type="number" value="0" min="0" max="100">
-    </label>
-
-    <label>Number of loaves
-      <select id="breadCount">
-        <option value="" disabled selected>Choose</option>
-        <option value="1">1 loaf</option>
-        <option value="2">2 loaves</option>
-        <option value="3">3 loaves</option>
-      </select>
-    </label>
-
-    <label>Loaf size
-      <select id="breadSize">
-        <option value="" disabled selected>Choose</option>
-        <option value="400">Small (400g flour)</option>
-        <option value="500">Medium (500g flour)</option>
-        <option value="625">Large (625g flour)</option>
-        <option value="750">Extra Large (750g flour)</option>
-      </select>
-    </label>
-
-    <label>Hydration
-      <select id="breadHydration" class="scrollable"></select>
-    </label>
-
-    <label>Yeast
-      <select id="breadYeast">
-        <option value="" disabled selected>Choose</option>
-        <option value="sourdough">Sourdough starter</option>
-        <option value="dry">Dry yeast</option>
-        <option value="bakers">Baker’s yeast</option>
-      </select>
-    </label>
-
-    <button onclick="calcBread()">Calculate Bread</button>
-    <div class="results" id="breadResults"></div>
+  <!-- HOME SCREEN -->
+  <div class="screen home-screen" id="homeScreen">
+    <button id="mainNewTripBtn" class="main-btn">➕ New Trip</button>
+    <div id="tripList" class="trip-grid"></div>
   </div>
 
-  <!-- PIZZA -->
-  <div id="pizza" class="panel">
-    <h2>Pizza</h2>
-    <label>Total flour available (g)
-      <input id="pizzaFlour" type="number" value="500">
-    </label>
+  <!-- MAP SCREEN -->
+  <div class="screen map-screen hidden" id="mapScreen">
+    <input id="tripNameInput" class="trip-name-input" value="Untitled Trip">
 
-    <label>Whole wheat %
-      <input id="pizzaWheat" type="number" value="0" min="0" max="100">
-    </label>
+    <div class="search-row">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Search anywhere in the world...">
+        <div id="results" class="results-dropdown"></div>
+      </div>
+    </div>
 
-  <label>Number of pizzas
-  <select id="pizzaCount">
-    <option value="" disabled selected>Choose</option>
-    <option value="1">1 pizza</option>
-    <option value="2">2 pizzas</option>
-    <option value="3">3 pizzas</option>
-    <option value="4">4 pizzas</option>
-    <option value="5">5 pizzas</option>
-    <option value="6">6 pizzas</option>
-    <option value="7">7 pizzas</option>
-    <option value="8">8 pizzas</option>
-  </select>
-</label>
+    <div class="map-controls">
+      <button id="routeBtn" disabled>🛣 Add to Route</button>
+      <button id="poiBtn" disabled>📍 Add POI</button>
+      <button id="deleteBtn">🗑 Clear</button>
+      <button id="saveTripBtn">💾 Save Trip</button>
+    </div>
 
-
-    <label>Pizza size
-      <select id="pizzaSize"></select>
-    </label>
-
-    <label>Hydration
-      <select id="pizzaHydration" class="scrollable"></select>
-    </label>
-
-    <label>Yeast
-      <select id="pizzaYeast">
-        <option value="" disabled selected>Choose</option>
-        <option value="sourdough">Sourdough starter</option>
-        <option value="dry">Dry yeast</option>
-        <option value="bakers">Baker’s yeast</option>
-      </select>
-    </label>
-
-    <button onclick="calcPizza()">Calculate Pizza</button>
-    <div class="results" id="pizzaResults"></div>
+    <div id="distanceInfo" class="distance-info"></div>
+    <div id="map"></div>
   </div>
 
-  <!-- RECIPES -->
-  <div id="recipes" class="panel">
-    <h2>📚 Recipes & Videos</h2>
-    <p style="text-align:center; opacity:0.6;">Links coming soon...</p>
-  </div>
+  <!-- CODES SCREEN -->
+  <div class="screen hidden" id="codesScreen">
+    <div class="codes-container">
+      <input type="text" id="codeLabelInput" placeholder="Label (Hotel, Flight, etc)">
+      <input type="text" id="codeInput" placeholder="Enter confirmation code">
+      <button id="saveCodeBtn">Save Code</button>
 
-  <!-- NOTES -->
-  <div id="notes" class="panel">
-    <h2>📝 Baking Notes</h2>
-    <textarea id="notesText" placeholder="Hydration, rise time, oven temp, results, changes..."></textarea>
-    <button onclick="saveNotes()">Save Notes</button>
-    <p id="savedMsg"></p>
+      <div id="codesList" class="codes-list"></div>
+    </div>
   </div>
 </div>
 
-<script src="script.js"></script>
-</body>
-</html>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
