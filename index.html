@@ -1,76 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Trip Planner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="phone">
+  <div class="topbar">
+    <span class="home-text" id="homeBtn">Home</span>
 
-  <!-- YOUR CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- LEAFLET MAP CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-</head>
-
-<body>
-  <div class="phone">
-    <div class="topbar">
-      <div class="left-buttons">
-        <span class="home-text" id="homeBtn">Home</span>
-        <span class="home-text" id="codesBtn">Codes</span>
-      </div>
-
-      <div class="title-group">
-        <div class="main-title">Trip Planner</div>
-        <div class="sub-title">by ChickChickRam</div>
-      </div>
-
-      <button id="topTripBtn" class="top-new-btn hidden">+ Trip</button>
+    <div class="title-group">
+      <div class="main-title">Trip Planner</div>
+      <div class="sub-title">by ChickChickRam</div>
     </div>
 
-    <!-- HOME -->
-    <div class="screen home-screen" id="homeScreen">
-      <button id="mainNewTripBtn" class="main-btn">➕ New Trip</button>
-      <div id="tripList" class="trip-grid"></div>
-    </div>
-
-    <!-- MAP -->
-    <div class="screen map-screen hidden" id="mapScreen">
-      <input id="tripNameInput" class="trip-name-input" value="Untitled Trip">
-
-      <div class="search-row">
-        <div class="search-wrapper">
-          <input type="text" id="searchInput" placeholder="Search anywhere in the world...">
-          <div id="results" class="results-dropdown"></div>
-        </div>
-      </div>
-
-      <div class="map-controls">
-        <button id="routeBtn" disabled>🛣 Add to Route</button>
-        <button id="poiBtn" disabled>📍 Add POI</button>
-        <button id="deleteBtn">🗑 Clear</button>
-        <button id="saveTripBtn">💾 Save Trip</button>
-      </div>
-
-      <div id="distanceInfo" class="distance-info"></div>
-      <div id="map"></div>
-    </div>
-
-    <!-- CODES -->
-    <div class="screen hidden" id="codesScreen">
-      <div class="codes-container">
-        <input type="text" id="codeLabelInput" placeholder="Label (Hotel, Flight, etc)">
-        <input type="text" id="codeInput" placeholder="Enter confirmation code">
-        <button id="saveCodeBtn">Save Code</button>
-        <div id="codesList" class="codes-list"></div>
-      </div>
-    </div>
+    <button id="codesBtn" class="top-new-btn" style="right:90px;">Codes</button>
+    <button id="topTripBtn" class="top-new-btn hidden">+ Trip</button>
   </div>
 
-  <!-- LEAFLET JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- HOME -->
+  <div class="screen home-screen" id="homeScreen">
+    <button id="mainNewTripBtn" class="main-btn">➕ New Trip</button>
+    <div id="tripList" class="trip-grid"></div>
+  </div>
 
-  <!-- YOUR JS -->
-  <script src="script.js"></script>
-</body>
-</html>
+  <!-- MAP -->
+  <div class="screen hidden" id="mapScreen">
+    <input id="tripNameInput" class="trip-name-input" value="Untitled Trip">
+
+    <div class="search-row">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Search anywhere in the world...">
+        <div id="results" class="results-dropdown"></div>
+      </div>
+    </div>
+
+    <div class="map-controls">
+      <button id="routeBtn" disabled>🛣 Add to Route</button>
+      <button id="poiBtn" disabled>📍 Add POI</button>
+      <button id="deleteBtn">🗑 Clear</button>
+      <button id="saveTripBtn">💾 Save Trip</button>
+    </div>
+
+    <div id="distanceInfo" class="distance-info"></div>
+    <div id="map"></div>
+  </div>
+
+  <!-- CODES -->
+  <div class="screen hidden" id="codesScreen" style="padding:12px;">
+    <input id="codeInput" placeholder="Enter confirmation code..." class="code-input">
+    <button id="saveCodeBtn" class="save-code-btn">Save Code</button>
+    <div id="codesList" class="codes-list"></div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
