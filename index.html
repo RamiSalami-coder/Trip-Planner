@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dough Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <h1>🍞 Dough Calculator</h1>
+  <p class="subtitle">by ChickChickRam</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="openTab('bread', this)">Bread</button>
+    <button class="tab" onclick="openTab('pizza', this)">Pizza</button>
+    <button class="tab" onclick="openTab('recipes', this)">Recipes / Videos</button>
+    <button class="tab" onclick="openTab('notes', this)">Notes</button>
+  </div>
+
+  <!-- BREAD -->
+  <div id="bread" class="panel active">
+    <h2>Bread</h2>
+    <label>Total flour available (g)
+      <input id="breadFlour" type="number" value="900">
+    </label>
+
+    <label>Whole wheat %
+      <input id="breadWheat" type="number" value="0" min="0" max="100">
+    </label>
+
+    <label>Number of loaves
+      <select id="breadCount">
+        <option value="" disabled selected>Choose</option>
+        <option value="1">1 loaf</option>
+        <option value="2">2 loaves</option>
+        <option value="3">3 loaves</option>
+      </select>
+    </label>
+
+    <label>Loaf size
+      <select id="breadSize">
+        <option value="" disabled selected>Choose</option>
+        <option value="400">Small (400g flour)</option>
+        <option value="500">Medium (500g flour)</option>
+        <option value="625">Large (625g flour)</option>
+        <option value="750">Extra Large (750g flour)</option>
+      </select>
+    </label>
+
+    <label>Hydration
+      <select id="breadHydration" class="scrollable"></select>
+    </label>
+
+    <label>Yeast
+      <select id="breadYeast">
+        <option value="" disabled selected>Choose</option>
+        <option value="sourdough">Sourdough starter</option>
+        <option value="dry">Dry yeast</option>
+        <option value="bakers">Baker’s yeast</option>
+      </select>
+    </label>
+
+    <button onclick="calcBread()">Calculate Bread</button>
+    <div class="results" id="breadResults"></div>
+  </div>
+
+  <!-- PIZZA -->
+  <div id="pizza" class="panel">
+    <h2>Pizza</h2>
+    <label>Total flour available (g)
+      <input id="pizzaFlour" type="number" value="500">
+    </label>
+
+    <label>Whole wheat %
+      <input id="pizzaWheat" type="number" value="0" min="0" max="100">
+    </label>
+
+  <label>Number of pizzas
+  <select id="pizzaCount">
+    <option value="" disabled selected>Choose</option>
+    <option value="1">1 pizza</option>
+    <option value="2">2 pizzas</option>
+    <option value="3">3 pizzas</option>
+    <option value="4">4 pizzas</option>
+    <option value="5">5 pizzas</option>
+    <option value="6">6 pizzas</option>
+    <option value="7">7 pizzas</option>
+    <option value="8">8 pizzas</option>
+  </select>
+</label>
+
+
+    <label>Pizza size
+      <select id="pizzaSize"></select>
+    </label>
+
+    <label>Hydration
+      <select id="pizzaHydration" class="scrollable"></select>
+    </label>
+
+    <label>Yeast
+      <select id="pizzaYeast">
+        <option value="" disabled selected>Choose</option>
+        <option value="sourdough">Sourdough starter</option>
+        <option value="dry">Dry yeast</option>
+        <option value="bakers">Baker’s yeast</option>
+      </select>
+    </label>
+
+    <button onclick="calcPizza()">Calculate Pizza</button>
+    <div class="results" id="pizzaResults"></div>
+  </div>
+
+  <!-- RECIPES -->
+  <div id="recipes" class="panel">
+    <h2>📚 Recipes & Videos</h2>
+    <p style="text-align:center; opacity:0.6;">Links coming soon...</p>
+  </div>
+
+  <!-- NOTES -->
+  <div id="notes" class="panel">
+    <h2>📝 Baking Notes</h2>
+    <textarea id="notesText" placeholder="Hydration, rise time, oven temp, results, changes..."></textarea>
+    <button onclick="saveNotes()">Save Notes</button>
+    <p id="savedMsg"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
